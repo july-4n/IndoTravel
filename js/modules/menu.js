@@ -1,14 +1,21 @@
+import {animateMenu} from './animateMenu.js';
+
 const menu = () => {
   const menuBtn = document.querySelector('.header__menu-button');
   const headerMenu = document.querySelector('.header__menu');
   const main = document.querySelector('main');
+  const header = document.querySelector('header');
+  const headerContainer = document.querySelector('.header__container');
+
+  const top = -(headerMenu.offsetHeight + headerContainer.offsetTop);
+  headerMenu.style.top = top + 'px';
 
   menuBtn.addEventListener('click', () => {
-    headerMenu.classList.add('header__menu_active');
+    animateMenu();
   });
 
   const closeMenu = () => {
-    headerMenu.classList.remove('header__menu_active');
+    headerMenu.style.top = top + 'px';
   };
 
   headerMenu.addEventListener('click', ({target}) => {
@@ -22,8 +29,12 @@ const menu = () => {
       closeMenu();
     }
   });
+
+  header.addEventListener('click', ({target}) => {
+    if (target !== menuBtn) {
+      closeMenu();
+    }
+  });
 };
 
-export {
-  menu,
-};
+menu();
