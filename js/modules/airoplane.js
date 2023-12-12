@@ -19,15 +19,15 @@ const scrollSvg = () => {
     airplane.style.display = window.innerWidth < 758 ? 'none' : 'block';
   };
 
+  let top = docEl.clientHeight - airplane.clientHeight;
+  airplane.style.top = top + 'px';
+
   const calcPositionSvg = () => {
     if (window.innerWidth >= 758) {
       // eslint-disable-next-line max-len
-      const maxScroll = docEl.scrollHeight - docEl.clientHeight + (10 * airplane.clientHeight);
-
-      const percentScroll = (window.pageYOffset / maxScroll) * 100;
-      // eslint-disable-next-line max-len
-      const top = docEl.clientHeight - (percentScroll * (docEl.clientHeight / 100) + airplane.clientHeight);
-
+      const maxScroll = docEl.scrollHeight - docEl.clientHeight;
+      const scrollProgress = window.pageYOffset / maxScroll;
+      top = (docEl.clientHeight - airplane.clientHeight) * (1 - scrollProgress);
       airplane.style.top = top + 'px';
     }
   };
@@ -37,7 +37,7 @@ const scrollSvg = () => {
     requestAnimationFrame(calcPositionSvg);
   });
 
-  calcPositionSvg();
+  checkDisplay();
 };
 
 scrollSvg();
