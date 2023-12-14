@@ -38,8 +38,20 @@ const minutesCaption = value => {
   }
 };
 
+const peopleCaption = value => {
+  if (value === 2 ||
+      value === 3 ||
+      value === 4) {
+    return 'человека';
+  } else if (value === 1 ||
+      (value >= 5 && value <= 21)) {
+    return 'человек';
+  }
+};
+
 export {
   daysCaption,
   hoursCaption,
   minutesCaption,
+  peopleCaption,
 };
