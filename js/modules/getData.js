@@ -13,15 +13,7 @@ const reservationPrice = reservation.querySelector('.reservation__price');
 reservationInfo.textContent = '';
 reservationPrice.textContent = '';
 
-const loadData = async (cb) => {
-  const result = await fetch('date.json');
-
-  const data = await result.json();
-
-  cb(data);
-};
-
-const loadData2 = async () => {
+const loadData = async () => {
   const result = await fetch('date.json');
 
   const data = await result.json();
@@ -35,7 +27,8 @@ const createOption = (text) => {
   return option;
 };
 
-const renderOptions = async (data) => {
+const renderOptions = async () => {
+  const data = await loadData();
   tourDate.innerHTML = '';
 
   const titleOptionDate = createOption("Выбери дату");
@@ -52,7 +45,8 @@ const renderOptions = async (data) => {
   tourDate.append(...dates);
 };
 
-const renderOptionsRes = async (data) => {
+const renderOptionsRes = async () => {
+  const data = await loadData();
   reservationDate.innerHTML = '';
 
   const titleOptionDateRes = createOption("Дата путешествия");
@@ -69,7 +63,8 @@ const renderOptionsRes = async (data) => {
   reservationDate.append(...dates);
 };
 
-const renderAmoutPeople = (data) => {
+const renderAmoutPeople = async () => {
+  const data = await loadData();
   tourPeople.innerHTML = '';
 
   const titleOptionPeople = createOption("Количество человек");
@@ -93,7 +88,8 @@ const renderAmoutPeople = (data) => {
   }
 };
 
-const renderAmoutPeopleRes = (data) => {
+const renderAmoutPeopleRes = async () => {
+  const data = await loadData();
   reservationPeople.innerHTML = '';
 
   const titleOptionPeople = createOption("Количество человек");
@@ -124,7 +120,7 @@ const getSummary = (date, people) => {
 };
 
 const getTotalPrice = async (date, people) => {
-  const data = await loadData2();
+  const data = await loadData();
   const selectedDate = date;
   const selectedDateData = data.find(el => el.date === selectedDate);
   const price = selectedDateData.price;
@@ -135,14 +131,14 @@ const getTotalPrice = async (date, people) => {
   }
 };
 
-loadData(renderOptions);
+renderOptions();
 tourDate.addEventListener('change', () => {
-  loadData(renderAmoutPeople);
+  renderAmoutPeople();
 });
 
-loadData(renderOptionsRes);
+renderOptionsRes();
 reservationDate.addEventListener('change', () => {
-  loadData(renderAmoutPeopleRes);
+  renderAmoutPeopleRes();
 });
 
 const handleChangeText = () => {
@@ -160,7 +156,6 @@ const handleChange = () => {
   }
 };
 
-reservationDate.addEventListener('change', handleChange);
 reservationPeople.addEventListener('change', handleChange);
 
 reservationDate.addEventListener('change', handleChangeText);
