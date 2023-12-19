@@ -5,6 +5,7 @@ const tour = document.querySelector('.tour');
 const tourDate = tour.querySelector('#tour__date');
 const tourPeople = tour.querySelector('#tour__people');
 const reservation = document.querySelector('.reservation');
+const reservationForm = reservation.querySelector('.reservation__form');
 const reservationDate = reservation.querySelector('#reservation__date');
 const reservationPeople = reservation.querySelector('#reservation__people');
 const reservationInfo = reservation.querySelector('.reservation__data');
@@ -12,6 +13,12 @@ const reservationPrice = reservation.querySelector('.reservation__price');
 
 reservationInfo.textContent = '';
 reservationPrice.textContent = '';
+
+const formReset = () => {
+  reservationForm.reset();
+  reservationInfo.textContent = '';
+  reservationPrice.textContent = '';
+};
 
 const loadData = async () => {
   const result = await fetch('date.json');
@@ -159,3 +166,7 @@ const handleChange = () => {
 reservationPeople.addEventListener('change', handleChange);
 
 reservationDate.addEventListener('change', handleChangeText);
+
+export {
+  formReset,
+};
