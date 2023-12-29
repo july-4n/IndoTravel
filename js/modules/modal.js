@@ -1,47 +1,62 @@
-const createModal = (obj) => {
+import {loadStyle} from './loadStyle.js';
+// import {getTotalPrice} from './getData.js';
+
+const reservation = document.querySelector('.reservation');
+const reservationDate = reservation.querySelector('#reservation__date');
+const reservationPeople = reservation.querySelector('#reservation__people');
+
+const showModal = async (err) => {
+  console.log('modal');
+  await loadStyle('css/modal.css');
+  console.log('modal2');
+  const overlay = document.createElement('div');
   const modal = document.createElement('div');
-  modal.classList.add('modal', 'is-visible');
+  const title = document.createElement('h2');
+  const travelDates = document.createElement('p');
+  const price = document.createElement('p');
+  const btnWrapper = document.createElement('div');
+  const btnConfirm = document.createElement('button');
+  const btnEdit = document.createElement('button');
 
-  modal.insertAdjacentHTML('beforeend', `
-    <div class='modal__wrapper'>
-      <div class='modal__overlay'></div>
-      <div class='modal__content'>
-        <h2 class='modal__title'>${obj.title}</h2>
-        <p class='modal__text'>${obj.text}</p>
-        ${obj.svg ?
-          `<div class='modal__icon'>
-            <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
-              <g clip-path="url(#clip0_0_1327)">
-                <path d="M23.2618 41.8332L12.4285
-                  30.9999L8.81738 34.611L23.2618
-                  49.0554L54.2142 18.1031L50.6031 14.4919L23.2618 41.8332Z"
-                  fill="white"/>
-              </g>
-            </svg>
-          </div>` : ''}
-        ${obj.btn ?
-          `<button type = 'button' class='modal__btn'>
-            Забронировать</button>` : ''}
-      </div>
-    </div>
-  `);
+  overlay.classList.add('overlay', 'overlay_confirm');
+  modal.classList.add('modal');
 
-  return modal;
-};
+  title.classList.add('modal__title');
+  title.textContent = 'Подтверждение заявки';
 
-const closeModal = (body, modal) => {
-  modal.classList.remove('is-visible');
-  body.classList.remove('overflow');
-};
+  travelDates.classList.add('modal__text');
+  const chosenDate = reservationDate.value;
 
-const renderModal = (body, obj) => {
-  const modal = createModal(obj);
-  body.classList.add('overflow');
-  body.append(modal);
-  return modal;
+  travelDates.textContent = `В даты: ${chosenDate}`;
+
+  price.classList.add('modal__text');
+  const chosenPeople = +reservationPeople.value;
+  // eslint-disable-next-line max-len
+  // price.textContent = `Стоимость тура ${getTotalPrice(chosenDate, chosenPeople)}P`;
+
+  btnWrapper.classList.add('modal__button', 'modal__btn_confirm');
+  btnConfirm.classList.add('modal__btn', 'modal__btn_edit');
+  btnConfirm.textContent = 'Подтверждаю';
+  btnEdit.classList.add('modal__btn');
+  btnEdit.textContent = 'Изменить данные';
+
+  overlay.append(modal);
+  btnWrapper.append(btnConfirm, btnEdit);
+  modal.append(title, travelDates, price, btnWrapper);
+  document.body.append(overlay);
+
+  return new Promise(resolve => {
+    btnConfirm.addEventListener('click', () => {
+      overlay.remove();
+      resolve(false);
+    });
+    btnEdit.addEventListener('click', () => {
+      overlay.remove();
+      resolve(true);
+    });
+  });
 };
 
 export {
-  renderModal,
-  closeModal,
+  showModal,
 };

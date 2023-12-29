@@ -1,0 +1,32 @@
+const fetchRequest = async (url, {
+  method = 'GET',
+  body,
+  cb,
+  headers,
+}) => {
+  try {
+    const options = {
+      method,
+    };
+
+    if (body) options.body = JSON.stringify(body);
+
+    if (headers) options.headers = headers;
+
+    const response = await fetch(url, options);
+
+    if (response.ok) {
+      const data = await response.json();
+
+      if (cb) return cb(null, data);
+      return;
+    }
+    throw new Error(response.statusText);
+  } catch (err) {
+    return cb(err);
+  }
+};
+
+export {
+  fetchRequest,
+};

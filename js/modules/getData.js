@@ -1,3 +1,5 @@
+import {fetchRequest} from './fetchRequest.js';
+import {showModal} from './modal.js';
 import {peopleCaption} from './wordDeclension.js';
 import {formatDate} from './formatDate.js';
 
@@ -10,6 +12,8 @@ const reservationDate = reservation.querySelector('#reservation__date');
 const reservationPeople = reservation.querySelector('#reservation__people');
 const reservationInfo = reservation.querySelector('.reservation__data');
 const reservationPrice = reservation.querySelector('.reservation__price');
+const reservationName = reservation.querySelector('#reservation__name');
+const reservationTel = reservation.querySelector('#reservation__phone');
 
 reservationInfo.textContent = '';
 reservationPrice.textContent = '';
@@ -20,43 +24,16 @@ const formReset = () => {
   reservationPrice.textContent = '';
 };
 
-const loadData = async () => {
-  const result = await fetch('date.json');
-
-  const data = await result.json();
-
-  return data;
-};
-
 const createOption = (text) => {
   const option = document.createElement('option');
   option.textContent = text;
   return option;
 };
 
-const renderOptions = async () => {
-  const data = await loadData();
-  tourDate.innerHTML = '';
+const renderOptions = async (target, titleText, data) => {
+  target.innerHTML = '';
 
-  const titleOptionDate = createOption("Выбери дату");
-
-  const dates = data.map(el => {
-    const option = createOption(el.date);
-    option.classList.add('tour__option');
-    option.value = el.date;
-
-    return option;
-  });
-
-  tourDate.append(titleOptionDate);
-  tourDate.append(...dates);
-};
-
-const renderOptionsRes = async () => {
-  const data = await loadData();
-  reservationDate.innerHTML = '';
-
-  const titleOptionDateRes = createOption("Дата путешествия");
+  const titleOption = createOption(titleText);
 
   const dates = data.map(el => {
     const option = createOption(el.date);
@@ -66,17 +43,14 @@ const renderOptionsRes = async () => {
     return option;
   });
 
-  reservationDate.append(titleOptionDateRes);
-  reservationDate.append(...dates);
+  target.append(titleOption);
+  target.append(...dates);
 };
 
-const renderAmoutPeople = async () => {
-  const data = await loadData();
-  tourPeople.innerHTML = '';
+const renderAmoutPeople = async (target, titleText, selectedDate, data) => {
+  target.innerHTML = '';
 
-  const titleOptionPeople = createOption("Количество человек");
-
-  const selectedDate = tourDate.value;
+  const titleOptionPeople = createOption(titleText);
   const selectedDateData = data.find(el => el.date === selectedDate);
 
   if (selectedDateData) {
@@ -90,82 +64,78 @@ const renderAmoutPeople = async () => {
       people.push(option);
     }
 
-    tourPeople.append(titleOptionPeople);
-    tourPeople.append(...people);
+    target.append(titleOptionPeople);
+    target.append(...people);
   }
 };
 
-const renderAmoutPeopleRes = async () => {
-  const data = await loadData();
-  reservationPeople.innerHTML = '';
+fetchRequest('date.json', {
+  method: 'GET',
+  headers: {'Content-Type': 'application/json'},
+  cb: (error, data) => {
+    if (error) {
+      console.error('Произошла ошибка:', error);
+    } else {
+      console.log('Полученные данные:', data);
 
-  const titleOptionPeople = createOption("Количество человек");
+      const getSummary = (date, people) => {
+        const formatedDate = formatDate(date);
+        // eslint-disable-next-line max-len
+        reservationInfo.textContent = `${formatedDate}, ${people} ${peopleCaption(parseInt(people))}`;
+      };
 
-  const selectedDate = reservationDate.value;
-  const selectedDateData = data.find(el => el.date === selectedDate);
+      const getTotalPrice = async (date, people) => {
+        const selectedDate = date;
+        const selectedDateData = data.find(el => el.date === selectedDate);
+        const price = selectedDateData.price;
 
-  if (selectedDateData) {
-    const {'min-people': minPeople,
-      'max-people': maxPeople} = selectedDateData;
+        if (!Number.isNaN(people) && typeof people === 'number') {
+          const total = price * people;
+          reservationPrice.textContent = total;
+        }
+      };
 
-    const people = [];
-    for (let i = minPeople; i <= maxPeople; i++) {
-      const option = createOption(i);
-      option.classList.add('tour__option');
-      people.push(option);
+      renderOptions(tourDate, "Выбери дату", data);
+      tourDate.addEventListener('change', () => {
+        // eslint-disable-next-line max-len
+        renderAmoutPeople(tourPeople, "Количество человек", tourDate.value, data);
+      });
+
+      renderOptions(reservationDate, "Дата путешествия", data);
+      reservationDate.addEventListener('change', () => {
+        // eslint-disable-next-line max-len
+        renderAmoutPeople(reservationPeople, "Количество человек", reservationDate.value, data);
+      });
+
+      const handleChangeText = () => {
+        reservationInfo.textContent = '';
+        reservationPrice.textContent = '';
+      };
+
+      const handleChange = () => {
+        const chosenDate = reservationDate.value;
+        const chosenPeople = +reservationPeople.value;
+
+        if (chosenDate && chosenPeople) {
+          getSummary(chosenDate, chosenPeople);
+          getTotalPrice(chosenDate, chosenPeople);
+        }
+      };
+
+      reservationPeople.addEventListener('change', handleChange);
+
+      reservationDate.addEventListener('change', handleChangeText);
     }
-
-    reservationPeople.append(titleOptionPeople);
-    reservationPeople.append(...people);
-  }
-};
-
-const getSummary = (date, people) => {
-  const formatedDate = formatDate(date);
-  // eslint-disable-next-line max-len
-  reservationInfo.textContent = `${formatedDate}, ${people} ${peopleCaption(parseInt(people))}`;
-};
-
-const getTotalPrice = async (date, people) => {
-  const data = await loadData();
-  const selectedDate = date;
-  const selectedDateData = data.find(el => el.date === selectedDate);
-  const price = selectedDateData.price;
-
-  if (!Number.isNaN(people) && typeof people === 'number') {
-    const total = price * people;
-    reservationPrice.textContent = total;
-  }
-};
-
-renderOptions();
-tourDate.addEventListener('change', () => {
-  renderAmoutPeople();
+  },
 });
 
-renderOptionsRes();
-reservationDate.addEventListener('change', () => {
-  renderAmoutPeopleRes();
+reservationForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  fetchRequest('date.json', {
+    method: 'GET',
+    cb: showModal,
+  });
 });
-
-const handleChangeText = () => {
-  reservationInfo.textContent = '';
-  reservationPrice.textContent = '';
-};
-
-const handleChange = () => {
-  const chosenDate = reservationDate.value;
-  const chosenPeople = +reservationPeople.value;
-
-  if (chosenDate && chosenPeople) {
-    getSummary(chosenDate, chosenPeople);
-    getTotalPrice(chosenDate, chosenPeople);
-  }
-};
-
-reservationPeople.addEventListener('change', handleChange);
-
-reservationDate.addEventListener('change', handleChangeText);
 
 export {
   formReset,
