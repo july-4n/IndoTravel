@@ -1,15 +1,15 @@
 const createModal = (obj) => {
   const modal = document.createElement('div');
-  modal.classList.add('modal', 'is-visible');
+  modal.classList.add('modal-add', 'is-visible');
 
   modal.insertAdjacentHTML('beforeend', `
-    <div class='modal__wrapper'>
-      <div class='modal__overlay'></div>
-      <div class='modal__content'>
-        <h2 class='modal__title'>${obj.title}</h2>
-        <p class='modal__text'>${obj.text}</p>
+    <div class='modal-add__wrapper'>
+      <div class='modal-add__overlay'></div>
+      <div class='modal-add__content'>
+        <h2 class='modal-add__title'>${obj.title}</h2>
+        <p class='modal-add__text'>${obj.text}</p>
         ${obj.svg ?
-          `<div class='modal__icon'>
+          `<div class='modal-add__icon'>
             <svg xmlns="http://www.w3.org/2000/svg" width="62" height="62" viewBox="0 0 62 62" fill="none">
               <g clip-path="url(#clip0_0_1327)">
                 <path d="M23.2618 41.8332L12.4285
@@ -20,7 +20,7 @@ const createModal = (obj) => {
             </svg>
           </div>` : ''}
         ${obj.btn ?
-          `<button type = 'button' class='modal__btn'>
+          `<button type = 'button' class='modal-add__btn'>
             Забронировать</button>` : ''}
       </div>
     </div>
@@ -34,7 +34,7 @@ const closeModal = (body, modal) => {
   body.classList.remove('overflow');
 };
 
-const renderModal = (body, obj) => {
+const renderModalAdd = (body, obj) => {
   const modal = createModal(obj);
   body.classList.add('overflow');
   body.append(modal);
@@ -42,6 +42,6 @@ const renderModal = (body, obj) => {
 };
 
 export {
-  renderModal,
+  renderModalAdd,
   closeModal,
 };

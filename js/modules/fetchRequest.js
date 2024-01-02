@@ -21,7 +21,7 @@ const fetchRequest = async (url, {
       if (cb) return cb(null, data);
       return;
     }
-    throw new Error(response.statusText);
+    throw new Error(`Ошибка ${response.status}: ${response.statusText}`);
   } catch (err) {
     return cb(err);
   }

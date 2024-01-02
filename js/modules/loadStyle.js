@@ -12,10 +12,10 @@ const loadStyle = url => {
     link.addEventListener('load', () => {
       resolve();
     });
-    document.head.append('link');
+    document.head.append(link);
   });
   styles.set(url, stylePromise);
   return stylePromise;
 };
 
-export {loadStyle};
+export default loadStyle;

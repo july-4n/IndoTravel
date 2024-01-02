@@ -1,5 +1,5 @@
 import {fetchRequest} from './fetchRequest.js';
-import {showModal} from './modal.js';
+import showModal from './modal.js';
 import {peopleCaption} from './wordDeclension.js';
 import {formatDate} from './formatDate.js';
 
@@ -12,8 +12,6 @@ const reservationDate = reservation.querySelector('#reservation__date');
 const reservationPeople = reservation.querySelector('#reservation__people');
 const reservationInfo = reservation.querySelector('.reservation__data');
 const reservationPrice = reservation.querySelector('.reservation__price');
-const reservationName = reservation.querySelector('#reservation__name');
-const reservationTel = reservation.querySelector('#reservation__phone');
 
 reservationInfo.textContent = '';
 reservationPrice.textContent = '';
@@ -69,6 +67,13 @@ const renderAmoutPeople = async (target, titleText, selectedDate, data) => {
   }
 };
 
+const getSummary = (date, people) => {
+  const formatedDate = formatDate(date);
+  // eslint-disable-next-line max-len
+  reservationInfo.textContent = `${formatedDate}, ${people} ${peopleCaption(parseInt(people))}`;
+  return `${formatedDate}, ${people} ${peopleCaption(parseInt(people))}`;
+};
+
 fetchRequest('date.json', {
   method: 'GET',
   headers: {'Content-Type': 'application/json'},
@@ -78,12 +83,6 @@ fetchRequest('date.json', {
     } else {
       console.log('Полученные данные:', data);
 
-      const getSummary = (date, people) => {
-        const formatedDate = formatDate(date);
-        // eslint-disable-next-line max-len
-        reservationInfo.textContent = `${formatedDate}, ${people} ${peopleCaption(parseInt(people))}`;
-      };
-
       const getTotalPrice = async (date, people) => {
         const selectedDate = date;
         const selectedDateData = data.find(el => el.date === selectedDate);
@@ -91,17 +90,21 @@ fetchRequest('date.json', {
 
         if (!Number.isNaN(people) && typeof people === 'number') {
           const total = price * people;
-          reservationPrice.textContent = total;
+          // eslint-disable-next-line max-len
+          const formattedNumber = total.toLocaleString('en-RU').replace(/,/g, ' ');
+          reservationPrice.textContent = formattedNumber + ' ₽';
         }
       };
 
       renderOptions(tourDate, "Выбери дату", data);
+
       tourDate.addEventListener('change', () => {
         // eslint-disable-next-line max-len
         renderAmoutPeople(tourPeople, "Количество человек", tourDate.value, data);
       });
 
       renderOptions(reservationDate, "Дата путешествия", data);
+
       reservationDate.addEventListener('change', () => {
         // eslint-disable-next-line max-len
         renderAmoutPeople(reservationPeople, "Количество человек", reservationDate.value, data);
