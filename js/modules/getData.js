@@ -16,6 +16,16 @@ const reservationPrice = reservation.querySelector('.reservation__price');
 reservationInfo.textContent = '';
 reservationPrice.textContent = '';
 
+const maskPhone = number => {
+  const phoneRegex = /^((\+7|7|8)+([0-9]){10})$/;
+  return phoneRegex.test(number);
+};
+
+const maskName = name => {
+  const cyrillicRegex = /^[а-яё]+ [а-яё]+ [а-яё]+ ?[а-яё]+$/gi;
+  return cyrillicRegex.test(name);
+};
+
 const formReset = () => {
   reservationForm.reset();
   reservationInfo.textContent = '';
@@ -132,8 +142,20 @@ fetchRequest('date.json', {
   },
 });
 
-reservationForm.addEventListener('submit', (evt) => {
+reservationForm.addEventListener('submit', evt => {
   evt.preventDefault();
+  const formData = new FormData(evt.target);
+  const fullName = Object.fromEntries(formData)['full-name'];
+  const phoneNumber = Object.fromEntries(formData).phone;
+
+  if (maskName(fullName) === false) {
+    return;
+  }
+
+  if (maskPhone(phoneNumber) === false) {
+    return;
+  }
+
   fetchRequest('date.json', {
     method: 'GET',
     cb: showModal,
