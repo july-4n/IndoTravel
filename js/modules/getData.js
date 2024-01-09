@@ -22,7 +22,8 @@ const maskPhone = number => {
 };
 
 const maskName = name => {
-  const cyrillicRegex = /^[а-яё]+ [а-яё]+ [а-яё]+ ?[а-яё]+$/gi;
+  // eslint-disable-next-line max-len
+  const cyrillicRegex = /^([а-яё]+\s){2,}[а-яё]+$/i;
   return cyrillicRegex.test(name);
 };
 
@@ -147,6 +148,8 @@ reservationForm.addEventListener('submit', evt => {
   const formData = new FormData(evt.target);
   const fullName = Object.fromEntries(formData)['full-name'];
   const phoneNumber = Object.fromEntries(formData).phone;
+  console.log(fullName);
+  console.log(maskName(fullName))
 
   if (maskName(fullName) === false) {
     return;
