@@ -1,3 +1,5 @@
+import './vendor/inputmask.min.js';
+import './vendor/just-validate.production.min.js';
 import {fetchRequest} from './fetchRequest.js';
 import showModal from './modal.js';
 import {peopleCaption} from './wordDeclension.js';
@@ -148,8 +150,6 @@ reservationForm.addEventListener('submit', evt => {
   const formData = new FormData(evt.target);
   const fullName = Object.fromEntries(formData)['full-name'];
   const phoneNumber = Object.fromEntries(formData).phone;
-  console.log(fullName);
-  console.log(maskName(fullName))
 
   if (maskName(fullName) === false) {
     return;

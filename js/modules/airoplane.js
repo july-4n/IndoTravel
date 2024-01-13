@@ -11,6 +11,7 @@ const scrollSvg = () => {
     pointer-events: none;
     background: url('img/airplane.svg') center/contain no-repeat;
     transition: top 0.3s ease-out;
+    z-index: 2;
   `;
 
   document.body.append(airplane);
