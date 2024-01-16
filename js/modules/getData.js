@@ -1,5 +1,3 @@
-import './vendor/inputmask.min.js';
-import './vendor/just-validate.production.min.js';
 import {fetchRequest} from './fetchRequest.js';
 import showModal from './modal.js';
 import {peopleCaption} from './wordDeclension.js';
@@ -14,20 +12,19 @@ const reservationDate = reservation.querySelector('#reservation__date');
 const reservationPeople = reservation.querySelector('#reservation__people');
 const reservationInfo = reservation.querySelector('.reservation__data');
 const reservationPrice = reservation.querySelector('.reservation__price');
+const reservationName = reservation.querySelector('#reservation__name');
+const reservationPhone = reservation.querySelector('#reservation__phone');
+const maskPhone = new Inputmask('+7 (999)-999-99-99');
+maskPhone.mask(reservationPhone);
 
 reservationInfo.textContent = '';
 reservationPrice.textContent = '';
 
-const maskPhone = number => {
-  const phoneRegex = /^((\+7|7|8)+([0-9]){10})$/;
-  return phoneRegex.test(number);
-};
-
-const maskName = name => {
-  // eslint-disable-next-line max-len
-  const cyrillicRegex = /^([а-яё]+\s){2,}[а-яё]+$/i;
-  return cyrillicRegex.test(name);
-};
+// const maskName = name => {
+//   // eslint-disable-next-line max-len
+//   const cyrillicRegex = /^([а-яё]+\s){2,}[а-яё]+$/i;
+//   return cyrillicRegex.test(name);
+// };
 
 const formReset = () => {
   reservationForm.reset();
@@ -81,10 +78,12 @@ const renderAmoutPeople = async (target, titleText, selectedDate, data) => {
 };
 
 const getSummary = (date, people) => {
-  const formatedDate = formatDate(date);
-  // eslint-disable-next-line max-len
-  reservationInfo.textContent = `${formatedDate}, ${people} ${peopleCaption(parseInt(people))}`;
-  return `${formatedDate}, ${people} ${peopleCaption(parseInt(people))}`;
+  if (date) {
+    const formatedDate = formatDate(date);
+    // eslint-disable-next-line max-len
+    reservationInfo.textContent = `${formatedDate}, ${people} ${peopleCaption(parseInt(people))}`;
+    return `${formatedDate}, ${people} ${peopleCaption(parseInt(people))}`;
+  }
 };
 
 fetchRequest('date.json', {
@@ -109,18 +108,18 @@ fetchRequest('date.json', {
         }
       };
 
-      renderOptions(tourDate, "Выбери дату", data);
+      renderOptions(tourDate, 'Выбери дату', data);
 
       tourDate.addEventListener('change', () => {
         // eslint-disable-next-line max-len
-        renderAmoutPeople(tourPeople, "Количество человек", tourDate.value, data);
+        renderAmoutPeople(tourPeople, 'Количество человек', tourDate.value, data);
       });
 
-      renderOptions(reservationDate, "Дата путешествия", data);
+      renderOptions(reservationDate, 'Дата путешествия', data);
 
       reservationDate.addEventListener('change', () => {
         // eslint-disable-next-line max-len
-        renderAmoutPeople(reservationPeople, "Количество человек", reservationDate.value, data);
+        renderAmoutPeople(reservationPeople, 'Количество человек', reservationDate.value, data);
       });
 
       const handleChangeText = () => {
@@ -145,25 +144,69 @@ fetchRequest('date.json', {
   },
 });
 
-reservationForm.addEventListener('submit', evt => {
-  evt.preventDefault();
-  const formData = new FormData(evt.target);
-  const fullName = Object.fromEntries(formData)['full-name'];
-  const phoneNumber = Object.fromEntries(formData).phone;
+const validate = new JustValidate(reservationForm);
+validate
+    .addField(reservationDate, [
+      {
+        rule: 'required',
+        errorMessage: 'Выберите даты путешествия',
+      },
+    ])
+    .addField(reservationPeople, [
+      {
+        rule: 'required',
+        errorMessage: 'Укажите количество человек',
+      },
+      // {
+      //   rule: 'number',
+      // },
+    ])
+    .addField(reservationName, [
+      {
+        rule: 'required',
+        errorMessage: 'Введите фамилию, имя, отчество',
+      },
+      {
+        rule: 'minLength',
+        value: 7,
+        errorMessage: 'Не короче 7 символов',
+      },
+    ])
+    .addField(reservationPhone, [
+      {
+        rule: 'required',
+        errorMessage: 'Укажите номер телефона',
+      },
+      {
+        validator() {
+          const phone = reservationPhone.inputmask.unmaskedvalue();
+          return !!(Number(phone) && phone.length === 10);
+        },
+        errorMessage: 'Телефон не корректный',
+      },
+    ])
+    .onSuccess(() => {
+      fetchRequest('date.json', {
+        method: 'GET',
+        cb: showModal,
+      });
+    });
 
-  if (maskName(fullName) === false) {
-    return;
-  }
 
-  if (maskPhone(phoneNumber) === false) {
-    return;
-  }
+// reservationForm.addEventListener('submit', evt => {
+//   evt.preventDefault();
+  // const formData = new FormData(evt.target);
+  // const fullName = Object.fromEntries(formData)['full-name'];
 
-  fetchRequest('date.json', {
-    method: 'GET',
-    cb: showModal,
-  });
-});
+  // if (maskName(fullName) === false) {
+  //   return;
+  // }
+
+//   fetchRequest('date.json', {
+//     method: 'GET',
+//     cb: showModal,
+//   });
+// });
 
 export {
   formReset,
