@@ -1,30 +1,26 @@
-import {fetchRequest} from './fetchRequest.js';
+import getElemsLayout from './getElemsLayout.js';
+import fetchRequest from './fetchRequest.js';
 import showModal from './modal.js';
-import {peopleCaption} from './wordDeclension.js';
-import {formatDate} from './formatDate.js';
+import pluralize from './pluralize.js';
+import formatDate from './formatDate.js';
 
-const tour = document.querySelector('.tour');
-const tourDate = tour.querySelector('#tour__date');
-const tourPeople = tour.querySelector('#tour__people');
-const reservation = document.querySelector('.reservation');
-const reservationForm = reservation.querySelector('.reservation__form');
-const reservationDate = reservation.querySelector('#reservation__date');
-const reservationPeople = reservation.querySelector('#reservation__people');
-const reservationInfo = reservation.querySelector('.reservation__data');
-const reservationPrice = reservation.querySelector('.reservation__price');
-const reservationName = reservation.querySelector('#reservation__name');
-const reservationPhone = reservation.querySelector('#reservation__phone');
+const {
+  tourDate,
+  tourPeople,
+  reservationForm,
+  reservationDate,
+  reservationPeople,
+  reservationInfo,
+  reservationPrice,
+  reservationName,
+  reservationPhone,
+} = getElemsLayout();
+
 const maskPhone = new Inputmask('+7 (999)-999-99-99');
 maskPhone.mask(reservationPhone);
 
 reservationInfo.textContent = '';
 reservationPrice.textContent = '';
-
-// const maskName = name => {
-//   // eslint-disable-next-line max-len
-//   const cyrillicRegex = /^([а-яё]+\s){2,}[а-яё]+$/i;
-//   return cyrillicRegex.test(name);
-// };
 
 const formReset = () => {
   reservationForm.reset();
@@ -35,6 +31,7 @@ const formReset = () => {
 const createOption = (text) => {
   const option = document.createElement('option');
   option.textContent = text;
+  option.value = text;
   return option;
 };
 
@@ -81,8 +78,8 @@ const getSummary = (date, people) => {
   if (date) {
     const formatedDate = formatDate(date);
     // eslint-disable-next-line max-len
-    reservationInfo.textContent = `${formatedDate}, ${people} ${peopleCaption(parseInt(people))}`;
-    return `${formatedDate}, ${people} ${peopleCaption(parseInt(people))}`;
+    reservationInfo.textContent = `${formatedDate}, ${people} ${pluralize(parseInt(people), ['человек', 'человека', 'человек'])}`;
+    return `${formatedDate}, ${people} ${pluralize(parseInt(people), ['человек', 'человека', 'человек'])}`;
   }
 };
 
@@ -93,7 +90,7 @@ fetchRequest('date.json', {
     if (error) {
       console.error('Произошла ошибка:', error);
     } else {
-      console.log('Полученные данные:', data);
+      // console.log('Полученные данные:', data);
 
       const getTotalPrice = async (date, people) => {
         const selectedDate = date;
@@ -115,6 +112,7 @@ fetchRequest('date.json', {
         renderAmoutPeople(tourPeople, 'Количество человек', tourDate.value, data);
       });
 
+      // форма бронирования
       renderOptions(reservationDate, 'Дата путешествия', data);
 
       reservationDate.addEventListener('change', () => {
@@ -138,11 +136,12 @@ fetchRequest('date.json', {
       };
 
       reservationPeople.addEventListener('change', handleChange);
-
       reservationDate.addEventListener('change', handleChangeText);
     }
   },
 });
+console.log(reservationPeople);
+console.log(reservationDate);
 
 const validate = new JustValidate(reservationForm);
 validate
@@ -157,9 +156,6 @@ validate
         rule: 'required',
         errorMessage: 'Укажите количество человек',
       },
-      // {
-      //   rule: 'number',
-      // },
     ])
     .addField(reservationName, [
       {
@@ -191,23 +187,3 @@ validate
         cb: showModal,
       });
     });
-
-
-// reservationForm.addEventListener('submit', evt => {
-//   evt.preventDefault();
-  // const formData = new FormData(evt.target);
-  // const fullName = Object.fromEntries(formData)['full-name'];
-
-  // if (maskName(fullName) === false) {
-  //   return;
-  // }
-
-//   fetchRequest('date.json', {
-//     method: 'GET',
-//     cb: showModal,
-//   });
-// });
-
-export {
-  formReset,
-};

@@ -1,4 +1,4 @@
-import {daysCaption, hoursCaption, minutesCaption} from './wordDeclension.js';
+import pluralize from './pluralize.js';
 
 const heroContent = document.querySelector('.hero__content');
 const heroText = heroContent.querySelector('.hero__text');
@@ -30,9 +30,9 @@ const timer = deadline => {
   const start = () => {
     const timer = getTimeRemaining();
 
-    captionDays.innerText = daysCaption(timer.days);
-    captionHours.innerText = hoursCaption(timer.hours);
-    captionMinutes.innerText = minutesCaption(timer.minutes);
+    captionDays.innerText = pluralize(timer.days, ['день', 'дня', 'дней']);
+    captionHours.innerText = pluralize(timer.hours, ['час', 'часа', 'часов']);
+    captionMinutes.innerText = pluralize(timer.minutes, ['минута', 'минуты', 'минут']);
 
     timerDays.textContent = timer.days;
     timerHours.textContent = formatTime(timer.hours);
@@ -50,6 +50,4 @@ const timer = deadline => {
   start();
 };
 
-export {
-  timer,
-};
+export default timer;

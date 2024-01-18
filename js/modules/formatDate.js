@@ -27,6 +27,4 @@ const formatDate = (dateRange) => {
   return convertedDateRange;
 };
 
-export {
-  formatDate,
-};
+export default formatDate;
