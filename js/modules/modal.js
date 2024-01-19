@@ -12,6 +12,7 @@ const {
   reservationPeople,
   reservationName,
   reservationPhone,
+  reservationBtn,
 } = getElemsLayout();
 
 const resetReservationData = () => {
@@ -19,21 +20,25 @@ const resetReservationData = () => {
   reservationPeople.disabled = true;
   reservationName.disabled = true;
   reservationPhone.disabled = true;
+  reservationBtn.disabled = true;
   reservationName.parentElement.style.pointerEvents = 'none';
   reservationPhone.parentElement.style.pointerEvents = 'none';
-}
+};
+
+const preparePhoneNumberToServer = (phone) => phone.replace(/[^\d]/g, '');
 
 const showModal = async () => {
   await loadStyle('css/modal.css');
-  const {btnConfirm, btnEdit, overlay} = createModal();
+  const {modalForm, btnEdit, overlay} = createModal();
 
   return new Promise(resolve => {
-    btnConfirm.addEventListener('click', () => {
+    modalForm.addEventListener('submit', (evt) => {
+      evt.preventDefault();
       const params = {
         date: reservationDate.value,
         people: reservationPeople.value,
         name: reservationName.value,
-        tel: reservationPhone.value,
+        tel: preparePhoneNumberToServer(reservationPhone.value),
       };
 
       fetchRequest(URL, {

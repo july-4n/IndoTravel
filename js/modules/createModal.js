@@ -11,6 +11,7 @@ const {
 const createModal = () => {
   const overlay = document.createElement('div');
   const modal = document.createElement('div');
+  const modalForm = document.createElement('form');
   const title = document.createElement('h2');
   const travelText = document.createElement('p');
   const travelDates = document.createElement('p');
@@ -21,6 +22,8 @@ const createModal = () => {
 
   overlay.classList.add('overlay', 'overlay_confirm');
   modal.classList.add('modal');
+  modalForm.method = 'post';
+  modalForm.action = '#';
 
   title.classList.add('modal__title');
   title.textContent = 'Подтверждение заявки';
@@ -41,21 +44,23 @@ const createModal = () => {
   btnWrapper.classList.add('modal__button', 'modal__btn_confirm');
   btnConfirm.classList.add('modal__btn', 'modal__btn_edit');
   btnConfirm.textContent = 'Подтверждаю';
-  btnConfirm.type = 'button';
+  btnConfirm.type = 'submit';
   btnEdit.classList.add('modal__btn');
   btnEdit.textContent = 'Изменить данные';
   btnEdit.type = 'button';
 
   overlay.append(modal);
+  modal.append(modalForm);
   btnWrapper.append(btnConfirm, btnEdit);
-  modal.append(title, travelText, travelDates, price, btnWrapper);
+  modalForm.append(title, travelText, travelDates, price, btnWrapper);
   document.body.append(overlay);
 
   return {
+    modalForm,
     btnConfirm,
     btnEdit,
     overlay,
-  }
+  };
 };
 
 export default createModal;

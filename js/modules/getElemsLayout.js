@@ -10,6 +10,7 @@ const getElemsLayout = () => {
   const reservationPrice = reservation.querySelector('.reservation__price');
   const reservationName = reservation.querySelector('#reservation__name');
   const reservationPhone = reservation.querySelector('#reservation__phone');
+  const reservationBtn = reservation.querySelector('.reservation__button');
 
   return {
     tourDate,
@@ -21,7 +22,8 @@ const getElemsLayout = () => {
     reservationPrice,
     reservationName,
     reservationPhone,
-  }
-}
+    reservationBtn,
+  };
+};
 
 export default getElemsLayout;
